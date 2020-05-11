@@ -1,12 +1,16 @@
 ---
 - hosts: localhost
   become: yes
+  vars:
+    USER: groot
+	  PASS: Qwerty123
+	  Business_Group: TEKsystems
   tasks:
   - name: Create new API instance with the Exchange asset passed
     shell: 
       cmd: |
         query='api-mgr api manage --type raml -m "{{API_Asset_Id}}" "{{API_Asset_Version}}"'
-        anypoint-cli --username="groot" --password="Qwerty123" --organization="{{Business_Group}}" --environment="{{Target_Environment}}" << EOF 
+        anypoint-cli --username="{{USER}}" --password="{{PASS}}" --organization="{{Business_Group}}" --environment="{{Target_Environment}}" << EOF 
         $query
         EOF
     args:
