@@ -1,0 +1,78 @@
+---
+- hosts: localhost
+  become: yes
+  vars:
+    USER: 
+	PASS: Qwerty123
+	USER: groot
+	Business_Group: TEKsystems
+  tasks:
+  
+  - name: Create new API instance with the Exchange asset passed
+    shell: 
+      cmd: |
+        query='api-mgr api manage --type raml -m "{{API_Asset_Id}}" "{{API_Asset_Version}}"'
+        anypoint-cli --username="{{USER}}" --password="{{PASS}}" --organization="{{Business_Group}}" --environment="{{Target_Environment}}" << EOF 
+        $query
+        EOF
+    args:
+      executable: /bin/bash
+    tags:
+      - create
+    register: out
+  - debug: var=out.stdout
+  
+  - name: Saving data to local file
+    copy:
+      content: "{{ out.stdout }}"
+      dest: "{{WORKSPACE}}/output.txt"
+    tags:
+      - savecreate
+      
+  - name: Apply policy
+    shell: anypoint-cli --username="{{USER}}" --password="{{PASS}}" --organization="{{Business_Group}}" --environment="{{Target_Environment}}" api-mgr policy apply -c '{"credentialsOriginHasHttpBasicAuthenticationHeader":"customExpression","clientIdExpression":"#[attributes.headers[\"client_id\"]]","clientSecretExpression":"#[attributes.headers[\"client_secret\"]]"}' "{{API_ID}}" client-id-enforcement --groupId 68ef9520-24e9-4cf2-b2f5-620025690913 --policyVersion 1.2.1
+    args:
+      executable: /bin/bash
+    tags:
+      - policy
+      
+  - name: Changes the asset version for the API instance passed
+    shell: anypoint-cli --username="{{USER}}" --password="{{PASS}}" --organization="{{Business_Group}}" --environment="{{Target_Environment}}" api-mgr api change-specification -o json "{{API_InstanceId}}" "{{API_Asset_Version}}"
+    args:
+      executable: /bin/bash
+    tags:
+      - update
+    register: result
+  - debug: var=result
+    
+  - name: Promotes an API instance from source environment
+    shell: anypoint-cli --username="{{USER}}" --password="{{PASS}}" --organization="{{Business_Group}}" --environment="{{Target_Environment}}" api-mgr api promote -o json --copyPolicies true "{{API_InstanceId}}" "{{TARGET}}"
+    args:
+      executable: /bin/bash
+    tags:
+      - promote
+      
+  - name: List API instance
+    shell: anypoint-cli --username="{{USER}}" --password="{{PASS}}" --organization="{{Business_Group}}" --environment="{{Target_Environment}}" api-mgr api list --instanceLabel "(Promoted)" -o json --assetId "{{API_Asset_Id}}"
+    args:
+      executable: /bin/bash
+    tags:
+      - list
+    register: out
+  - debug: var=out.stdout
+
+  - name: Saving data to local file
+    copy:
+      content: "{{ out.stdout }}"
+      dest: "{{WORKSPACE}}/output.json"
+    tags:
+      - savepromote
+      
+  - name: Edits the API instance passed
+    shell: anypoint-cli --username="{{USER}}" --password="{{PASS}}" --organization="{{Business_Group}}" --environment="{{Target_Environment}}" api-mgr api edit --apiInstanceLabel "{{API_ID}}" "{{API_ID}}"
+    args:
+      executable: /bin/bash
+    tags:
+      - edit
+    register: result
+  - debug: var=result
