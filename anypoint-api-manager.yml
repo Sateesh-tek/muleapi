@@ -1,9 +1,6 @@
 ---
 - hosts: localhost
-  state: latest
-  update_cache: yes
   become: yes
-  gather_facts: false
   tasks:
   - name: Create new API instance with the Exchange asset passed
     shell: 
