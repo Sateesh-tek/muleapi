@@ -1,10 +1,10 @@
 ---
 - hosts: localhost
   become: yes
-  vars:
+  vars: 
+    PASS: Qwerty123
     USER: groot
-	  PASS: Qwerty123
-	  Business_Group: TEKsystems
+    Business_Group: TEKsystems
   tasks:
   - name: Create new API instance with the Exchange asset passed
     shell: 
