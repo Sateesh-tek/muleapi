@@ -14,7 +14,6 @@
     tags:
       - create
     register: out
-  - debug: var=out.stdout
   
   - name: Saving data to local file
     copy:
