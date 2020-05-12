@@ -1,5 +1,7 @@
 ---
 - hosts: localhost
+  state: latest
+  update_cache: yes
   become: yes
   gather_facts: false
   tasks:
