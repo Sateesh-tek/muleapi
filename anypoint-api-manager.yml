@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: localhost
   become: yes
   tasks:
   - name: Create new API instance with the Exchange asset passed
