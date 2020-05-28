@@ -46,27 +46,5 @@
     tags:
       - promote
       
-  - name: List API instance
-    shell: anypoint-cli --username="{{USER}}" --password="{{PASS}}" --organization="{{Business_Group}}" --environment="{{Target_Environment}}" api-mgr api list --instanceLabel "(Promoted)" -o json --assetId "{{API_Asset_Id}}"
-    args:
-      executable: /bin/bash
-    tags:
-      - list
-    register: out
-  - debug: var=out.stdout
-
-  - name: Saving data to local file
-    copy:
-      content: "{{ out.stdout }}"
-      dest: "{{WORKSPACE}}/output.json"
-    tags:
-      - savepromote
-      
-  - name: Edits the API instance passed
-    shell: anypoint-cli --username="{{USER}}" --password="{{PASS}}" --organization="{{Business_Group}}" --environment="{{Target_Environment}}" api-mgr api edit --apiInstanceLabel "{{API_ID}}" "{{API_ID}}"
-    args:
-      executable: /bin/bash
-    tags:
-      - edit
-    register: result
-  - debug: var=result
+  
+  
